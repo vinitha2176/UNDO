@@ -217,4 +217,67 @@ describe('Undo Backend REST API Integration Tests', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.error.code).toBe('UNEXPECTED_FIELD');
   });
+
+  describe('Boundary & Negative Error Handling Tests', () => {
+    it('Invalid sessionId UUID format returns 400 VALIDATION_ERROR', async () => {
+      const res = await request(app).get('/api/v1/sessions/not-a-valid-uuid/plan');
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('Nonexistent sessionId UUID returns 404 SESSION_NOT_FOUND', async () => {
+      const res = await request(app).get('/api/v1/sessions/00000000-0000-0000-0000-000000000000/plan');
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('SESSION_NOT_FOUND');
+    });
+
+    it('Nonexistent fileId in plan update returns 404 FILE_NOT_FOUND', async () => {
+      const sessRes = await request(app).post('/api/v1/sessions');
+      const sessionId = sessRes.body.data.sessionId;
+
+      const res = await request(app)
+        .patch(`/api/v1/sessions/${sessionId}/plan/files/00000000-0000-0000-0000-000000000000`)
+        .send({ proposedFilename: 'rename.pdf' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('FILE_NOT_FOUND');
+    });
+
+    it('Attempting to create export when 0 files are included returns 400 EXPORT_ERROR', async () => {
+      const sessRes = await request(app).post('/api/v1/sessions');
+      const sessionId = sessRes.body.data.sessionId;
+
+      // Upload 1 file
+      const upRes = await request(app)
+        .post(`/api/v1/sessions/${sessionId}/files`)
+        .attach('files', Buffer.from('hello test'), 'hello.txt');
+      const fileId = upRes.body.data.files[0].id;
+
+      // Exclude it from plan
+      await request(app)
+        .patch(`/api/v1/sessions/${sessionId}/plan/files/${fileId}`)
+        .send({ isIncludedInExport: false });
+
+      // Attempt export
+      const expRes = await request(app).post(`/api/v1/sessions/${sessionId}/exports`);
+      expect(expRes.status).toBe(400);
+      expect(expRes.body.success).toBe(false);
+      expect(expRes.body.error.code).toBe('EMPTY_EXPORT');
+    });
+
+    it('Downloading nonexistent export returns 404 EXPORT_NOT_FOUND', async () => {
+      const sessRes = await request(app).post('/api/v1/sessions');
+      const sessionId = sessRes.body.data.sessionId;
+
+      const res = await request(app).get(
+        `/api/v1/sessions/${sessionId}/exports/00000000-0000-0000-0000-000000000000/download`
+      );
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('EXPORT_NOT_FOUND');
+    });
+  });
 });

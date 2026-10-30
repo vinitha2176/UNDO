@@ -239,8 +239,9 @@ export function updatePlanFileItem(
   let activePlan = sessionService.getActivePlan(sessionId);
   if (!activePlan || activePlan.size === 0) {
     const rawFiles = sessionService.getSessionFiles(sessionId);
-    activePlan = generateInitialPlan(sessionId, rawFiles);
-    sessionService.setActivePlan(sessionId, activePlan, true);
+    const initial = generateInitialPlan(sessionId, rawFiles);
+    sessionService.setActivePlan(sessionId, initial, true);
+    activePlan = sessionService.getActivePlan(sessionId)!;
   }
 
   const existingItem = activePlan.get(fileId);
@@ -362,6 +363,7 @@ export function updatePlanFileItem(
   planItem.proposedPath = resolvedPath;
 
   activePlan.set(fileId, planItem);
+  sessionService.setActivePlan(sessionId, activePlan);
   return planItem;
 }
 
