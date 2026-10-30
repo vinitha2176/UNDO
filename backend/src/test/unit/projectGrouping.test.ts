@@ -44,4 +44,81 @@ describe('Project Grouping Unit Tests', () => {
     const { projectGroups } = detectProjectGroups(files);
     expect(projectGroups).toHaveLength(0);
   });
+
+  describe('Pre-Phase 4 Regression Datasets', () => {
+    it('Dataset A — Generic names: FORM_A.docx, FORM_B.docx, FORM_C.docx must not invent a project "Form"', () => {
+      const files = [
+        { id: 'a1', originalName: 'FORM_A.docx' },
+        { id: 'a2', originalName: 'FORM_B.docx' },
+        { id: 'a3', originalName: 'FORM_C.docx' },
+      ];
+
+      const { projectGroups, fileGroupMap } = detectProjectGroups(files);
+      expect(projectGroups).toHaveLength(0);
+      expect(fileGroupMap.size).toBe(0);
+    });
+
+    it('Dataset B — Meaningful project identifiers: pathfinder files must create a Pathfinder project', () => {
+      const files = [
+        { id: 'b1', originalName: 'pathfinder_report.pdf' },
+        { id: 'b2', originalName: 'pathfinder_diagram.png' },
+        { id: 'b3', originalName: 'pathfinder_presentation.pptx' },
+      ];
+
+      const { projectGroups, fileGroupMap } = detectProjectGroups(files);
+      expect(projectGroups).toHaveLength(1);
+      expect(projectGroups[0].groupName).toBe('Pathfinder');
+      expect(projectGroups[0].folderName).toBe('Projects/Pathfinder');
+      expect(projectGroups[0].fileCount).toBe(3);
+      expect(fileGroupMap.get('b1')?.groupName).toBe('Pathfinder');
+      expect(fileGroupMap.get('b2')?.groupName).toBe('Pathfinder');
+      expect(fileGroupMap.get('b3')?.groupName).toBe('Pathfinder');
+    });
+
+    it('Dataset C — Revision names: resume_final.pdf, resume_updated.pdf, resume_copy.pdf must not create projects from revision words', () => {
+      const files = [
+        { id: 'c1', originalName: 'resume_final.pdf' },
+        { id: 'c2', originalName: 'resume_updated.pdf' },
+        { id: 'c3', originalName: 'resume_copy.pdf' },
+      ];
+
+      const { projectGroups, fileGroupMap } = detectProjectGroups(files);
+      expect(projectGroups).toHaveLength(0);
+      expect(fileGroupMap.size).toBe(0);
+    });
+
+    it('Dataset D — Mixed files: invoice_october.pdf, college_notes.docx, holiday_photo.png, budget.xlsx must not invent project without evidence', () => {
+      const files = [
+        { id: 'd1', originalName: 'invoice_october.pdf' },
+        { id: 'd2', originalName: 'college_notes.docx' },
+        { id: 'd3', originalName: 'holiday_photo.png' },
+        { id: 'd4', originalName: 'budget.xlsx' },
+      ];
+
+      const { projectGroups, fileGroupMap } = detectProjectGroups(files);
+      expect(projectGroups).toHaveLength(0);
+      expect(fileGroupMap.size).toBe(0);
+    });
+
+    it('Observed Case: Disambiguates generic "FORM" prefix from distinctive "Medicard" project', () => {
+      const files = [
+        { id: 'm1', originalName: 'FORM_Medicard_Enrollment.docx' },
+        { id: 'm2', originalName: 'FORM_Medicard_Claim.docx' },
+        { id: 'm3', originalName: 'FORM_Medicard_Benefits.docx' },
+        { id: 'm4', originalName: 'FORM_Generic_Standard.docx' },
+      ];
+
+      const { projectGroups, fileGroupMap } = detectProjectGroups(files);
+      // "Form" must NOT be a project; "Medicard" MUST be the project
+      expect(projectGroups).toHaveLength(1);
+      expect(projectGroups[0].groupName).toBe('Medicard');
+      expect(projectGroups[0].folderName).toBe('Projects/Medicard');
+      expect(projectGroups[0].fileCount).toBe(3);
+
+      expect(fileGroupMap.get('m1')?.groupName).toBe('Medicard');
+      expect(fileGroupMap.get('m2')?.groupName).toBe('Medicard');
+      expect(fileGroupMap.get('m3')?.groupName).toBe('Medicard');
+      expect(fileGroupMap.get('m4')).toBeUndefined();
+    });
+  });
 });

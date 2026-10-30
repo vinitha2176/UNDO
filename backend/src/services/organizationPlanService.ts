@@ -115,7 +115,8 @@ export function generateInitialPlan(
       suggestedGroup = projectInfo.groupName;
     } else {
       targetFolder = formatCategoryFolder(file.category);
-      groupingReason = `Assigned to '${targetFolder}' based on ${file.categoryReason}`;
+      const extDesc = file.extension ? `.${file.extension.toUpperCase()}` : 'file type';
+      groupingReason = `Placed in ${targetFolder} because this is a ${extDesc} file. Insufficient evidence to identify a project.`;
     }
 
     // Predictable path collision resolution
@@ -130,7 +131,7 @@ export function generateInitialPlan(
     // Duplicates may be excluded only after the user explicitly chooses to exclude them.
     const isIncludedInExport = true;
     if (isDuplicate) {
-      groupingReason = `Exact duplicate of '${primaryFile.originalName}' (SHA-256 match); retained by default`;
+      groupingReason = `Exact duplicate of '${primaryFile.originalName}' (SHA-256 match); retained by default until explicit exclusion`;
     }
 
     const item: OrganizationPlanItem = {

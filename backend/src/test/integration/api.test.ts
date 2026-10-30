@@ -137,11 +137,10 @@ describe('Undo Backend REST API Integration Tests', () => {
     expect(analysis.duplicateGroups[0].fileCount).toBe(2);
     expect(analysis.duplicateGroups[0].sha256).toBe(hash1);
 
-    // Verify project groups
-    expect(analysis.suggestedProjectGroups).toHaveLength(2);
-    const groupNames = analysis.suggestedProjectGroups.map((g: any) => g.groupName);
-    expect(groupNames).toContain('Pathfinder');
-    expect(groupNames).toContain('Invoice');
+    // Verify project groups: 'Pathfinder' is identified as a distinct project, while generic 'invoice' is excluded
+    expect(analysis.suggestedProjectGroups).toHaveLength(1);
+    expect(analysis.suggestedProjectGroups[0].groupName).toBe('Pathfinder');
+    expect(analysis.suggestedProjectGroups[0].folderName).toBe('Projects/Pathfinder');
 
     // 5. GET /api/v1/sessions/:sessionId/plan
     const planRes = await request(app).get(`/api/v1/sessions/${sessionId}/plan`);

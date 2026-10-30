@@ -21,6 +21,8 @@ storage/
 backend/storage/
 temp/
 */temp/
+temp_*/
+*/temp_*/
 
 # Logs and test artifacts
 *.log
@@ -33,3 +35,4 @@ coverage/
 # Operating system files
 .DS_Store
 Thumbs.db
+

@@ -51,16 +51,16 @@ describe('Frontend API Client & Backend Live Integration Tests', () => {
     const samples = generateSampleFiles();
     const uploadRes = await api.uploadFiles(activeSessionId, samples);
 
-    expect(uploadRes.uploadedCount).toBe(9);
-    expect(uploadRes.totalSessionFiles).toBe(9);
-    expect(uploadRes.files.length).toBe(9);
+    expect(uploadRes.uploadedCount).toBe(30);
+    expect(uploadRes.totalSessionFiles).toBe(30);
+    expect(uploadRes.files.length).toBe(30);
   });
 
   it('retrieves analysis and detects exact duplicates from backend', async () => {
     if (!activeSessionId) return;
 
     const analysis = await api.getSessionAnalysis(activeSessionId);
-    expect(analysis.totalFiles).toBe(9);
+    expect(analysis.totalFiles).toBe(30);
     expect(analysis.duplicateGroups.length).toBeGreaterThanOrEqual(1);
 
     const dup = analysis.duplicateGroups[0];
@@ -71,8 +71,8 @@ describe('Frontend API Client & Backend Live Integration Tests', () => {
     if (!activeSessionId) return;
 
     const plan = await api.getSessionPlan(activeSessionId);
-    expect(plan.totalFiles).toBe(9);
-    expect(plan.includedInExport).toBe(9); // all files included by default, including exact duplicates
+    expect(plan.totalFiles).toBe(30);
+    expect(plan.includedInExport).toBe(30); // all files included by default, including exact duplicates
 
     // Modify first file
     const targetFile = plan.plan[0];
@@ -86,7 +86,7 @@ describe('Frontend API Client & Backend Live Integration Tests', () => {
 
     // Retrieve updated virtual tree
     const treeRes = await api.getPlanTree(activeSessionId);
-    expect(treeRes.summary.totalImportedFiles).toBe(9);
+    expect(treeRes.summary.totalImportedFiles).toBe(30);
     expect(treeRes.summary.renamedCount).toBeGreaterThanOrEqual(1);
 
     // Initial duplicate status is all_retained
@@ -113,6 +113,6 @@ describe('Frontend API Client & Backend Live Integration Tests', () => {
     const exportRecord = await api.createExport(activeSessionId);
     expect(exportRecord.exportId).toBeDefined();
     expect(exportRecord.sizeBytes).toBeGreaterThan(0);
-    expect(exportRecord.fileCount).toBe(9);
+    expect(exportRecord.fileCount).toBe(30);
   });
 });

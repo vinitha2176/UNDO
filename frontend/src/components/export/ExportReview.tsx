@@ -165,14 +165,14 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
           </p>
         </div>
 
-        {/* Big Action Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+        {/* Primary Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-lg mx-auto">
           <Button
             variant="outline"
             size="lg"
             onClick={onBackToStudio}
             disabled={isExporting}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto px-5 whitespace-nowrap"
           >
             ← Modify Plan
           </Button>
@@ -182,8 +182,8 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
             size="lg"
             onClick={handleExport}
             isLoading={isExporting}
-            className="w-full sm:w-auto px-8 shadow-md"
-            icon={<Download className="w-5 h-5" />}
+            className="w-full sm:w-auto px-7 whitespace-nowrap shadow-md"
+            icon={<Download className="w-5 h-5 shrink-0" />}
           >
             Download Organized Files
           </Button>

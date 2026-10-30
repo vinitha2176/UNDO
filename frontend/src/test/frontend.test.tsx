@@ -25,7 +25,7 @@ describe('Frontend Utilities & Formatters Unit Tests', () => {
 
   it('generateSampleFiles returns realistic synthetic files with exact duplicates', () => {
     const files = generateSampleFiles();
-    expect(files.length).toBe(9);
+    expect(files.length).toBe(30);
 
     const resume1 = files.find((f) => f.name === 'resume_final.pdf');
     const resume2 = files.find((f) => f.name === 'resume_final_copy.pdf');
