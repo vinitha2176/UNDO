@@ -501,3 +501,4 @@ main().catch((err) => {
   console.error('Benchmark failed with error:', err);
   process.exit(1);
 });
+

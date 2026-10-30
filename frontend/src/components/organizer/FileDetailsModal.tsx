@@ -141,10 +141,11 @@ export const FileDetailsModal: React.FC<FileDetailsModalProps> = ({
 
         {/* 1. Proposed Filename */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider">
+          <label htmlFor="proposed-filename-input" className="block text-xs font-semibold text-charcoal uppercase tracking-wider">
             Proposed Filename
           </label>
           <input
+            id="proposed-filename-input"
             type="text"
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
@@ -168,10 +169,11 @@ export const FileDetailsModal: React.FC<FileDetailsModalProps> = ({
 
         {/* 2. Destination Folder */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider">
+          <label htmlFor="destination-folder-input" className="block text-xs font-semibold text-charcoal uppercase tracking-wider">
             Destination Folder
           </label>
           <input
+            id="destination-folder-input"
             type="text"
             value={destinationFolder}
             onChange={(e) => setDestinationFolder(e.target.value)}

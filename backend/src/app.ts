@@ -32,7 +32,7 @@ export function createApp(): Express {
         return callback(new AppError(`CORS request from origin '${origin}' blocked`, 403, 'CORS_ERROR'));
       },
       credentials: true,
-      methods: ['GET', 'POST', 'OPTIONS'],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     })
   );
