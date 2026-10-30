@@ -1,0 +1,35 @@
+# Root .gitignore for UNDO
+
+# Node dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+dist/
+*/dist/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+*/.env
+*/.env.*
+!*/.env.example
+
+# Temporary isolated session storage and uploads
+storage/
+backend/storage/
+temp/
+*/temp/
+
+# Logs and test artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.nyc_output/
+
+# Operating system files
+.DS_Store
+Thumbs.db
