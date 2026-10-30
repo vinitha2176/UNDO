@@ -93,11 +93,11 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             onSelectFile(node.fileId);
           }
         }}
-        style={{ paddingLeft: `${Math.max(level * 16, 8)}px` }}
+        style={{ paddingLeft: `${Math.max(level * 18, 8)}px` }}
         className={clsx(
-          'flex items-center justify-between py-1.5 pr-3 rounded-lg cursor-pointer transition-colors group',
-          isSelected && 'bg-brand-100 text-brand-900 font-medium',
-          !isSelected && 'hover:bg-zinc-100 text-charcoal'
+          'flex items-center justify-between py-1.5 pr-3 rounded-xl cursor-pointer transition-all group',
+          isSelected && 'bg-brand-100 text-brand-950 font-semibold shadow-xs',
+          !isSelected && 'hover:bg-zinc-100/80 text-charcoal'
         )}
       >
         <div className="flex items-center gap-2 min-w-0 pr-2">
@@ -105,37 +105,39 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             <>
               <button
                 type="button"
-                className="p-0.5 text-zinc-400 hover:text-zinc-700 shrink-0"
+                className="p-0.5 text-zinc-400 hover:text-brand-600 transition-colors shrink-0"
               >
                 {isExpanded ? (
-                  <ChevronDown className="w-3.5 h-3.5" />
+                  <ChevronDown className="w-3.5 h-3.5 text-brand-600" />
                 ) : (
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
                 )}
               </button>
               {isExpanded ? (
-                <FolderOpen className="w-4 h-4 text-brand-500 shrink-0" />
+                <FolderOpen className="w-4 h-4 text-brand-600 shrink-0" />
               ) : (
                 <Folder className="w-4 h-4 text-brand-500 shrink-0" />
               )}
-              <span className="font-semibold text-xs sm:text-sm truncate">{node.name}</span>
+              <span className="font-bold text-xs sm:text-sm text-charcoal truncate">{node.name}</span>
             </>
           ) : (
             <>
               <span className="w-4" /> {/* Indent offset matching folder chevron */}
               {getFileIcon(node.name)}
-              <span className="text-xs sm:text-sm truncate">{node.name}</span>
+              <span className="text-xs sm:text-sm text-charcoal-muted group-hover:text-charcoal font-medium truncate">
+                {node.name}
+              </span>
             </>
           )}
         </div>
 
         <div className="flex items-center gap-2 shrink-0 text-xs font-mono text-zinc-400">
           {isFolder ? (
-            <span className="text-[11px] bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-600 font-sans">
+            <span className="text-[11px] bg-brand-50 text-brand-700 border border-brand-200/60 px-2 py-0.5 rounded-full font-sans font-semibold">
               {node.fileCount} {node.fileCount === 1 ? 'file' : 'files'}
             </span>
           ) : (
-            <span>{formatBytes(node.aggregateSize)}</span>
+            <span className="font-mono text-charcoal-subtle text-[11px]">{formatBytes(node.aggregateSize)}</span>
           )}
         </div>
       </div>

@@ -96,72 +96,75 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Hero Header */}
-      <div className="text-center space-y-2 pt-2">
-        <h1 className="text-3xl font-extrabold tracking-tight text-charcoal">
+      <div className="text-center space-y-2.5 pt-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint-100 text-mint-dark text-xs font-bold uppercase tracking-wider border border-mint/40">
+          <CheckCircle2 className="w-3.5 h-3.5 text-mint-dark" />
           Ready to put everything in order?
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-charcoal">
+          Everything in its place.
         </h1>
-        <p className="text-charcoal-subtle max-w-lg mx-auto text-sm">
-          Review your finalized organization plan below. UNDO will package your files into a clean,
-          structured ZIP archive containing a verified change manifest.
+        <p className="text-charcoal-muted max-w-lg mx-auto text-sm leading-relaxed">
+          Review your organized collection before downloading. Your original files haven't been changed.
         </p>
       </div>
 
       {/* Summary Metrics Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-4 border border-zinc-200 shadow-card">
-          <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold uppercase">
-            <FileCheck className="w-4 h-4 text-teal-600" />
+        <div className="bg-white rounded-2xl p-4 border border-[#E9E7EF] shadow-card hover:border-brand-200 transition-colors">
+          <div className="flex items-center gap-2 text-charcoal-subtle text-xs font-bold uppercase tracking-wider">
+            <FileCheck className="w-4 h-4 text-mint-dark" />
             Included Files
           </div>
-          <div className="text-2xl font-bold text-charcoal mt-2">
+          <div className="text-2xl sm:text-3xl font-extrabold text-charcoal mt-2 font-sans">
             {planSummary.includedInExport}
           </div>
-          <p className="text-[11px] text-zinc-400">of {planSummary.totalFiles} original files</p>
+          <p className="text-[11px] text-charcoal-subtle font-medium">of {planSummary.totalFiles} original files</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-zinc-200 shadow-card">
-          <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold uppercase">
-            <FileX className="w-4 h-4 text-amber-600" />
+        <div className="bg-white rounded-2xl p-4 border border-[#E9E7EF] shadow-card hover:border-brand-200 transition-colors">
+          <div className="flex items-center gap-2 text-charcoal-subtle text-xs font-bold uppercase tracking-wider">
+            <FileX className="w-4 h-4 text-peach-dark" />
             Excluded Copies
           </div>
-          <div className="text-2xl font-bold text-charcoal mt-2">
+          <div className="text-2xl sm:text-3xl font-extrabold text-charcoal mt-2 font-sans">
             {planSummary.excludedDuplicates}
           </div>
-          <p className="text-[11px] text-zinc-400">redundant duplicates</p>
+          <p className="text-[11px] text-charcoal-subtle font-medium">redundant duplicates</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-zinc-200 shadow-card">
-          <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold uppercase">
+        <div className="bg-white rounded-2xl p-4 border border-[#E9E7EF] shadow-card hover:border-brand-200 transition-colors">
+          <div className="flex items-center gap-2 text-charcoal-subtle text-xs font-bold uppercase tracking-wider">
             <FolderTree className="w-4 h-4 text-brand-600" />
             Target Folders
           </div>
-          <div className="text-2xl font-bold text-charcoal mt-2">
+          <div className="text-2xl sm:text-3xl font-extrabold text-charcoal mt-2 font-sans">
             {virtualTree.summary.folderCount}
           </div>
-          <p className="text-[11px] text-zinc-400">clean directory tree</p>
+          <p className="text-[11px] text-charcoal-subtle font-medium">clean directory tree</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-zinc-200 shadow-card">
-          <div className="flex items-center gap-2 text-zinc-400 text-xs font-semibold uppercase">
+        <div className="bg-white rounded-2xl p-4 border border-[#E9E7EF] shadow-card hover:border-brand-200 transition-colors">
+          <div className="flex items-center gap-2 text-charcoal-subtle text-xs font-bold uppercase tracking-wider">
             <FileEdit className="w-4 h-4 text-purple-600" />
             Renamed Files
           </div>
-          <div className="text-2xl font-bold text-charcoal mt-2">{renamedCount}</div>
-          <p className="text-[11px] text-zinc-400">safe collision-free names</p>
+          <div className="text-2xl sm:text-3xl font-extrabold text-charcoal mt-2 font-sans">{renamedCount}</div>
+          <p className="text-[11px] text-charcoal-subtle font-medium">collision-free names</p>
         </div>
       </div>
 
       {/* Main Action Card */}
-      <div className="bg-white rounded-3xl border border-zinc-200 shadow-card p-6 sm:p-8 text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mx-auto">
+      <div className="bg-white rounded-3xl border border-[#E9E7EF] shadow-card p-6 sm:p-8 text-center space-y-6">
+        <div className="w-16 h-16 rounded-3xl bg-brand-50 border border-brand-200/80 flex items-center justify-center text-brand-600 mx-auto shadow-sm shadow-brand-500/10">
           <FolderArchive className="w-8 h-8" />
         </div>
 
-        <div className="space-y-1">
-          <h2 className="text-xl font-bold text-charcoal">Download Organized Files</h2>
-          <p className="text-xs sm:text-sm text-charcoal-subtle max-w-md mx-auto">
+        <div className="space-y-1.5">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-charcoal">Download Organized Files</h2>
+          <p className="text-xs sm:text-sm text-charcoal-muted max-w-md mx-auto leading-relaxed">
             Package estimated {formatBytes(virtualTree.summary.estimatedOutputSize)} into a downloadable ZIP archive.
-            Includes machine-readable <code className="font-mono bg-zinc-100 px-1 py-0.5 rounded text-zinc-800">undo-manifest.json</code>.
+            Includes auditable <code className="font-mono bg-brand-50 text-brand-800 px-1.5 py-0.5 rounded border border-brand-200/60">undo-manifest.json</code>.
           </p>
         </div>
 
@@ -182,7 +185,7 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
             size="lg"
             onClick={handleExport}
             isLoading={isExporting}
-            className="w-full sm:w-auto px-7 whitespace-nowrap shadow-md"
+            className="w-full sm:w-auto px-7 whitespace-nowrap shadow-md shadow-brand-500/25"
             icon={<Download className="w-5 h-5 shrink-0" />}
           >
             Download Organized Files
@@ -194,7 +197,7 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
           <button
             type="button"
             onClick={() => setIsManifestOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs text-brand-700 hover:text-brand-900 font-medium hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs text-brand-700 hover:text-brand-900 font-semibold hover:underline"
           >
             <Eye className="w-3.5 h-3.5" />
             Preview undo-manifest.json
@@ -202,29 +205,32 @@ export const ExportReview: React.FC<ExportReviewProps> = ({
         </div>
 
         {/* Zero-damage guarantee */}
-        <div className="pt-2 border-t border-zinc-100 flex items-center justify-center gap-2 text-xs text-teal-800">
-          <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
-          <span>Original files on your machine remain completely untouched in their original folders.</span>
+        <div className="pt-3 border-t border-[#E9E7EF] flex items-center justify-center gap-2 text-xs text-mint-dark font-medium">
+          <ShieldCheck className="w-4 h-4 text-mint-dark shrink-0" />
+          <span>Original files on your computer remain completely untouched in their original locations.</span>
         </div>
       </div>
 
       {/* Success banner after download */}
       {downloadSuccess && (
-        <div className="p-4 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-between gap-4 animate-in fade-in duration-200">
+        <div className="p-5 rounded-2xl bg-mint-50 border border-mint/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-200 shadow-card">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0" />
-            <div className="text-sm text-teal-950">
-              <span className="font-semibold">Archive generated successfully!</span>
-              <p className="text-xs text-teal-800 mt-0.5">
-                Saved as <code className="font-mono">{downloadSuccess.filename}</code> ({formatBytes(downloadSuccess.sizeBytes)}).
+            <div className="w-10 h-10 rounded-2xl bg-mint-100 flex items-center justify-center text-mint-dark shrink-0">
+              <CheckCircle2 className="w-6 h-6 text-mint-dark" />
+            </div>
+            <div className="text-sm text-mint-dark">
+              <span className="font-extrabold text-base">Your organized collection is ready!</span>
+              <p className="text-xs text-mint-dark/90 mt-0.5">
+                Saved as <code className="font-mono font-semibold bg-white/70 px-1.5 py-0.5 rounded border border-mint/40">{downloadSuccess.filename}</code> ({formatBytes(downloadSuccess.sizeBytes)}).
               </p>
             </div>
           </div>
           <Button
-            variant="success"
+            variant="outline"
             size="sm"
             onClick={() => onGenerateAndDownload()}
             icon={<Download className="w-3.5 h-3.5" />}
+            className="bg-white border-mint text-mint-dark hover:bg-mint-100/50"
           >
             Download Again
           </Button>

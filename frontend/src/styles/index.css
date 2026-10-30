@@ -4,7 +4,65 @@
 
 @layer base {
   body {
+    background-color: #FAF9F6;
+    color: #20212B;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom subtle scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #E9E7EF;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C4B5FD;
+  }
+}
+
+@layer utilities {
+  .subtle-border {
+    border: 1px solid #E9E7EF;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid #E9E7EF;
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, #8B5CF6 0%, #A7E8CE 100%);
+  }
+
+  .accent-gradient-soft {
+    background: linear-gradient(135deg, #FAF9F6 0%, #F5F3FF 50%, #FAF9F6 100%);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -70,21 +70,45 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
     return sortAsc ? cmp : -cmp;
   });
 
+  const [selectedFileForInspection, setSelectedFileForInspection] = useState<SafeFileMetadata | null>(
+    analysis.files.length > 0 ? analysis.files[0] : null
+  );
+
+  // Compute category color mapping
+  const categoryColorMap: Record<string, string> = {
+    documents: 'bg-blue-400',
+    spreadsheets: 'bg-emerald-400',
+    presentations: 'bg-amber-400',
+    images: 'bg-purple-400',
+    videos: 'bg-rose-400',
+    audio: 'bg-pink-400',
+    archives: 'bg-indigo-400',
+    'source code': 'bg-teal-400',
+    others: 'bg-zinc-400',
+  };
+
   const categories = Object.entries(analysis.categories).filter(([_, count]) => count > 0);
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-[#E9E7EF]">
         <div>
-          <h2 className="text-2xl font-bold text-charcoal">File Analysis Summary</h2>
-          <p className="text-sm text-charcoal-subtle">
-            Deterministic analysis of file extensions, checksums, and project conventions
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-charcoal">
+              File Analysis Summary
+            </h2>
+            <Badge variant="mint" size="sm">
+              Analysis Complete
+            </Badge>
+          </div>
+          <p className="text-sm text-charcoal-muted mt-1">
+            Deterministic analysis of file extensions, cryptographic checksums, and project conventions
           </p>
         </div>
         <button
           onClick={onProceedToStudio}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm shadow-sm transition-all active:scale-[0.98]"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-sm hover:shadow-card-hover transition-all active:scale-[0.98] shadow-brand-500/20"
         >
           Open Organization Studio →
         </button>
@@ -93,68 +117,91 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
       {/* 4 Stat Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Files */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card flex items-center gap-4 hover:border-brand-300 transition-colors">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 shrink-0">
             <FileText className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-charcoal">{analysis.totalFiles}</div>
-            <div className="text-xs text-charcoal-subtle">Total Imported Files</div>
+            <div className="text-2xl font-extrabold text-charcoal">{analysis.totalFiles}</div>
+            <div className="text-xs font-medium text-charcoal-subtle">Total Imported Files</div>
           </div>
         </div>
 
         {/* Total Storage */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card flex items-center gap-4 hover:border-brand-300 transition-colors">
+          <div className="w-12 h-12 rounded-2xl bg-mint-100 border border-mint/40 flex items-center justify-center text-mint-dark shrink-0">
             <HardDrive className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-charcoal">{formatBytes(analysis.totalSizeBytes)}</div>
-            <div className="text-xs text-charcoal-subtle">Total Session Storage</div>
+            <div className="text-2xl font-extrabold text-charcoal">{formatBytes(analysis.totalSizeBytes)}</div>
+            <div className="text-xs font-medium text-charcoal-subtle">Total Session Storage</div>
           </div>
         </div>
 
         {/* Exact Duplicates */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card flex items-center gap-4 hover:border-brand-300 transition-colors">
+          <div className="w-12 h-12 rounded-2xl bg-peach-100 border border-peach/50 flex items-center justify-center text-peach-dark shrink-0">
             <Copy className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-charcoal">
+            <div className="text-2xl font-extrabold text-charcoal">
               {analysis.duplicateGroups.length}
             </div>
-            <div className="text-xs text-charcoal-subtle">
+            <div className="text-xs font-medium text-charcoal-subtle">
               Exact Duplicate Groups {redundantBytes > 0 && `(${formatBytes(redundantBytes)} redundant)`}
             </div>
           </div>
         </div>
 
         {/* Project Groups */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card flex items-center gap-4 hover:border-brand-300 transition-colors">
+          <div className="w-12 h-12 rounded-2xl bg-brand-100 border border-brand-200 flex items-center justify-center text-brand-700 shrink-0">
             <FolderGit2 className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-bold text-charcoal">
+            <div className="text-2xl font-extrabold text-charcoal">
               {analysis.suggestedProjectGroups.length}
             </div>
-            <div className="text-xs text-charcoal-subtle">Suggested Project Groups</div>
+            <div className="text-xs font-medium text-charcoal-subtle">Suggested Project Groups</div>
           </div>
         </div>
       </div>
 
-      {/* Category Distribution Pills */}
-      <div className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-card space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal-subtle">
-          Detected File Categories
-        </h3>
-        <div className="flex flex-wrap gap-2">
+      {/* Visual Category Distribution Bar & Filter Pills */}
+      <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+            Category Breakdown & Composition
+          </h3>
+          <span className="text-xs text-charcoal-subtle font-mono">
+            {categories.length} distinct categories detected
+          </span>
+        </div>
+
+        {/* Horizontal Visual Distribution Bar */}
+        <div className="w-full h-3 rounded-full overflow-hidden flex bg-zinc-100 subtle-border">
+          {categories.map(([category, count]) => {
+            const pct = (count / analysis.totalFiles) * 100;
+            const barClass = categoryColorMap[category] || 'bg-brand-400';
+            return (
+              <div
+                key={category}
+                style={{ width: `${pct}%` }}
+                className={`${barClass} h-full transition-all`}
+                title={`${category}: ${count} files (${Math.round(pct)}%)`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex flex-wrap gap-2 pt-1">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               selectedCategory === 'all'
-                ? 'bg-zinc-800 text-white border-zinc-800'
-                : 'bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100'
+                ? 'bg-charcoal text-white border-charcoal shadow-sm'
+                : 'bg-[#FAF9F6] text-charcoal-muted border-[#E9E7EF] hover:bg-zinc-100'
             }`}
           >
             All Categories ({analysis.totalFiles})
@@ -165,10 +212,10 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border capitalize transition-colors ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border capitalize transition-all ${
                   isSelected
-                    ? 'bg-brand-600 text-white border-brand-600'
-                    : 'bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100'
+                    ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                    : 'bg-[#FAF9F6] text-charcoal-muted border-[#E9E7EF] hover:bg-brand-50 hover:border-brand-200'
                 }`}
               >
                 {category} ({count})
@@ -177,6 +224,36 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Transparent Explanation Inspector Banner */}
+      {selectedFileForInspection && (
+        <div className="bg-gradient-to-r from-brand-50/60 via-white to-purple-50/60 rounded-2xl p-4 border border-brand-200/80 shadow-card flex items-start gap-3.5 animate-in fade-in duration-200">
+          <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 shrink-0 mt-0.5 shadow-sm">
+            <Info className="w-5 h-5" />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-700">
+                Why did UNDO place this here?
+              </span>
+              <span className="text-xs font-mono font-medium text-charcoal truncate">
+                {selectedFileForInspection.originalName}
+              </span>
+            </div>
+            <p className="text-sm text-charcoal font-medium">
+              {selectedFileForInspection.groupingReason || selectedFileForInspection.categoryReason}
+            </p>
+            {selectedFileForInspection.suggestedGroup && (
+              <div className="pt-1 flex items-center gap-2 text-xs text-charcoal-subtle">
+                <span>Associated Project:</span>
+                <Badge variant="brand" size="sm">
+                  {selectedFileForInspection.suggestedGroup}
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* File List Table with Search and Filters */}
       <div className="bg-white rounded-2xl border border-zinc-200 shadow-card overflow-hidden">
@@ -261,10 +338,10 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
                 <th className="py-3 px-4">Analysis Reason</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-[#E9E7EF]">
               {sortedFiles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-zinc-400 text-sm">
+                  <td colSpan={5} className="py-8 text-center text-charcoal-subtle text-sm">
                     No files match the selected search and filter criteria.
                   </td>
                 </tr>
@@ -275,12 +352,21 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
                   );
                   const isPrimary = dupGroup?.primaryFileId === file.id;
                   const isDupCopy = dupGroup && !isPrimary;
+                  const isInspected = selectedFileForInspection?.id === file.id;
 
                   return (
-                    <tr key={file.id} className="hover:bg-zinc-50/60 transition-colors">
+                    <tr
+                      key={file.id}
+                      onClick={() => setSelectedFileForInspection(file)}
+                      className={`transition-colors cursor-pointer ${
+                        isInspected
+                          ? 'bg-brand-50/70 border-l-4 border-l-brand-600'
+                          : 'hover:bg-[#FAF9F6]'
+                      }`}
+                    >
                       <td className="py-3 px-4 font-medium text-charcoal">
                         <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-zinc-400 shrink-0" />
+                          <FileText className={`w-4 h-4 shrink-0 ${isInspected ? 'text-brand-600' : 'text-zinc-400'}`} />
                           <span className="truncate max-w-xs">{file.originalName}</span>
                           {isDupCopy && (
                             <Badge variant="warning" size="sm">
@@ -297,7 +383,7 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
 
                       <td className="py-3 px-4">
                         <span
-                          className={`inline-block px-2 py-0.5 rounded text-xs font-medium border capitalize ${getCategoryBadgeClass(
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${getCategoryBadgeClass(
                             file.category
                           )}`}
                         >

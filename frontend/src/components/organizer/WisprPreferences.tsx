@@ -157,72 +157,77 @@ export const WisprPreferences: React.FC<WisprPreferencesProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-card space-y-4">
+    <div className="bg-white rounded-2xl border border-[#E9E7EF] p-5 shadow-card space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-charcoal">
-              Describe how you want your files organized
+            <h3 className="text-base sm:text-lg font-extrabold text-charcoal">
+              Tell UNDO how you like things organized.
             </h3>
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-purple-700">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 border border-brand-200/80">
               Voice Dictation Ready
             </span>
           </div>
-          <p className="text-xs text-charcoal-subtle mt-0.5">
-            Prefer to speak? Dictate your preferences using <strong>Wispr Flow</strong> directly into this field.
+          <p className="text-xs text-charcoal-muted mt-1">
+            Type your preference, or dictate it using <strong>Wispr Flow</strong> directly into this field.
           </p>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <textarea
-          rows={2}
+          rows={3}
           value={dictationText}
           onChange={(e) => {
             setDictationText(e.target.value);
             interpretPreferences(e.target.value);
           }}
           placeholder="e.g. Put all project screenshots in an Assets folder and keep presentations separate..."
-          className="w-full p-3 text-sm bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all resize-none"
+          className="w-full p-3.5 text-sm bg-[#FAF9F6] border border-[#E9E7EF] rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all resize-none font-sans text-charcoal placeholder:text-charcoal-subtle"
         />
 
         {/* Quick sample chips */}
-        <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-[11px] text-zinc-400">Try dictating:</span>
-          {[
-            'Organize files by year and month',
-            'Group design files into a branding folder',
-            'Put all invoices in Finance/2026',
-            'Keep all duplicates',
-            'Exclude all duplicate copies',
-          ].map((sample) => (
-            <button
-              key={sample}
-              type="button"
-              onClick={() => {
-                setDictationText(sample);
-                interpretPreferences(sample);
-              }}
-              className="text-xs bg-zinc-100 hover:bg-brand-50 hover:text-brand-700 text-zinc-600 px-2.5 py-1 rounded-lg transition-colors border border-zinc-200/60"
-            >
-              "{sample}"
-            </button>
-          ))}
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-charcoal-subtle block">
+            Supported Dictation Examples:
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+            {[
+              'Organize files by year and month',
+              'Group design files into a branding folder',
+              'Put all invoices in Finance/2026',
+              'Keep all duplicates',
+              'Exclude all duplicate copies',
+              'Put all screenshots in a Screenshots folder',
+            ].map((sample) => (
+              <button
+                key={sample}
+                type="button"
+                onClick={() => {
+                  setDictationText(sample);
+                  interpretPreferences(sample);
+                }}
+                className="text-xs bg-[#FAF9F6] hover:bg-brand-50 hover:text-brand-700 hover:border-brand-300 text-charcoal-muted px-2.5 py-1 rounded-lg transition-colors border border-[#E9E7EF]"
+              >
+                "{sample}"
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Interpreted rule confirmation */}
       {interpretedRule && (
-        <div className="p-4 rounded-xl bg-brand-50/70 border border-brand-200 space-y-3 animate-in fade-in duration-150">
+        <div className="p-4 rounded-xl bg-brand-50/80 border border-brand-200 space-y-3 animate-in fade-in duration-150">
           <div className="flex items-start gap-2.5">
             <Sparkles className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <span className="font-semibold text-brand-950">Interpreted Organization Rule:</span>
-              <p className="text-xs text-brand-800 mt-0.5">{interpretedRule.description}</p>
+              <span className="font-bold text-brand-950">Interpreted Organization Rule:</span>
+              <p className="text-xs text-brand-900 mt-0.5 leading-relaxed font-medium">{interpretedRule.description}</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-1 border-t border-brand-200/50">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-brand-200/60">
             <Button
               variant="outline"
               size="sm"
@@ -239,6 +244,7 @@ export const WisprPreferences: React.FC<WisprPreferencesProps> = ({
               onClick={handleApply}
               isLoading={isApplying}
               icon={<Check className="w-3.5 h-3.5" />}
+              className="shadow-sm shadow-brand-500/20"
             >
               Confirm & Apply Rule
             </Button>

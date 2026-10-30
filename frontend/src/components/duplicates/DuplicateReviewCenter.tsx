@@ -54,32 +54,32 @@ export const DuplicateReviewCenter: React.FC<DuplicateReviewCenterProps> = ({
   return (
     <div className="space-y-5">
       {/* Overview Banner */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-[#E9E7EF] p-5 shadow-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-charcoal">Duplicate Review Center</h3>
-            <Badge variant="warning">{duplicateGroups.length} Duplicate Group(s)</Badge>
+            <h3 className="text-lg sm:text-xl font-extrabold text-charcoal">Same files, different names?</h3>
+            <Badge variant="peach">{duplicateGroups.length} Duplicate Group(s)</Badge>
           </div>
-          <p className="text-xs text-charcoal-subtle mt-0.5">
-            Files with identical SHA-256 byte signatures across different filenames or folders
+          <p className="text-xs text-charcoal-muted mt-1 max-w-xl leading-relaxed">
+            UNDO found files with identical content. Decide which copies should appear in your organized download.
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-right">
-          <div>
-            <div className="text-xl font-bold text-teal-700">
+          <div className="bg-mint-50 border border-mint/40 px-3.5 py-2 rounded-xl">
+            <div className="text-xl font-extrabold text-mint-dark">
               {formatBytes(totalRedundant)}
             </div>
-            <div className="text-[11px] text-charcoal-subtle">Potential Redundant Storage</div>
+            <div className="text-[11px] font-semibold text-mint-dark/80">Redundant Storage Identified</div>
           </div>
         </div>
       </div>
 
-      {/* Zero deletion reminder */}
-      <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-teal-50/60 border border-teal-200 text-teal-900 text-xs">
-        <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
-        <span>
-          <strong>Safe Deduplication:</strong> Excluded copies are omitted from the generated ZIP archive only. Your original source files are never deleted or modified.
+      {/* Zero deletion reassurance */}
+      <div className="flex items-center gap-3 p-4 rounded-2xl bg-mint-50/80 border border-mint/40 text-mint-dark text-xs shadow-xs">
+        <ShieldCheck className="w-5 h-5 text-mint-dark shrink-0" />
+        <span className="leading-relaxed">
+          <strong className="font-bold">Your original files remain untouched:</strong> Excluded duplicate copies simply won't be included in the new ZIP download. All duplicates remain included by default until you confirm an exclusion.
         </span>
       </div>
 
@@ -91,22 +91,24 @@ export const DuplicateReviewCenter: React.FC<DuplicateReviewCenterProps> = ({
           return (
             <div
               key={group.sha256}
-              className="bg-white rounded-2xl border border-zinc-200 shadow-card p-5 space-y-4"
+              className="bg-white rounded-2xl border border-[#E9E7EF] shadow-card p-5 space-y-4 hover:border-brand-200 transition-colors"
             >
               {/* Group Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E9E7EF]">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Copy className="w-4 h-4 text-amber-500" />
-                    <span className="font-semibold text-sm text-charcoal">
-                      {group.fileCount} Identical Copies
+                    <div className="w-7 h-7 rounded-lg bg-peach-100 flex items-center justify-center text-peach-dark">
+                      <Copy className="w-4 h-4" />
+                    </div>
+                    <span className="font-bold text-sm text-charcoal">
+                      {group.fileCount} Identical Content Copies
                     </span>
                     <span className="text-xs text-charcoal-subtle font-mono">
                       ({formatBytes(group.totalSizeBytes / group.fileCount)} each)
                     </span>
                   </div>
-                  <p className="text-[11px] font-mono text-zinc-400 truncate max-w-md">
-                    SHA-256: {group.sha256}
+                  <p className="text-[11px] font-mono text-charcoal-subtle truncate max-w-md">
+                    Matching SHA-256: {group.sha256}
                   </p>
                 </div>
 
@@ -141,10 +143,10 @@ export const DuplicateReviewCenter: React.FC<DuplicateReviewCenterProps> = ({
                   return (
                     <div
                       key={copy.fileId}
-                      className={`flex items-center justify-between p-3 rounded-xl border text-sm transition-colors ${
+                      className={`flex items-center justify-between p-3 rounded-xl border text-sm transition-all ${
                         copy.isIncludedInExport
-                          ? 'bg-teal-50/40 border-teal-200'
-                          : 'bg-zinc-50 border-zinc-200 opacity-70'
+                          ? 'bg-mint-50/40 border-mint/40 shadow-xs'
+                          : 'bg-[#FAF9F6] border-[#E9E7EF] opacity-70'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0 pr-2">
@@ -159,26 +161,26 @@ export const DuplicateReviewCenter: React.FC<DuplicateReviewCenterProps> = ({
                               handleAction(group.sha256, 'exclude_selected', undefined, [copy.fileId]);
                             }
                           }}
-                          className="rounded border-zinc-300 text-teal-600 focus:ring-teal-500 w-4 h-4"
+                          className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
                         />
                         <div className="truncate">
-                          <span className="font-medium text-charcoal">{copy.originalName}</span>
+                          <span className="font-semibold text-charcoal">{copy.originalName}</span>
                           {isRecommended && (
-                            <span className="ml-2 text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded font-semibold uppercase">
-                              Recommended Copy
+                            <span className="ml-2 text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                              Primary Copy
                             </span>
                           )}
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs font-mono text-zinc-500">
+                        <span className="text-xs font-mono text-charcoal-subtle">
                           {formatBytes(copy.size)}
                         </span>
                         <span
-                          className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                          className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
                             copy.isIncludedInExport
-                              ? 'bg-teal-100 text-teal-800'
+                              ? 'bg-mint-100 text-mint-dark border border-mint/40'
                               : 'bg-zinc-200 text-zinc-600'
                           }`}
                         >

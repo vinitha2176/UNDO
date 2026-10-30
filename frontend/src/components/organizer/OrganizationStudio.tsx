@@ -104,15 +104,15 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6">
       {/* Studio Navigation Bar */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-zinc-200 shadow-card">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white p-3.5 rounded-2xl border border-[#E9E7EF] shadow-card">
         {/* Tab buttons */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveTab('tree')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'tree'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/25'
+                : 'bg-[#FAF9F6] hover:bg-zinc-100 text-charcoal-muted hover:text-charcoal border border-[#E9E7EF]'
             }`}
           >
             <FolderTree className="w-4 h-4" />
@@ -121,10 +121,10 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
 
           <button
             onClick={() => setActiveTab('comparison')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'comparison'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/25'
+                : 'bg-[#FAF9F6] hover:bg-zinc-100 text-charcoal-muted hover:text-charcoal border border-[#E9E7EF]'
             }`}
           >
             <ArrowRightLeft className="w-4 h-4" />
@@ -133,10 +133,10 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
 
           <button
             onClick={() => setActiveTab('duplicates')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'duplicates'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/25'
+                : 'bg-[#FAF9F6] hover:bg-zinc-100 text-charcoal-muted hover:text-charcoal border border-[#E9E7EF]'
             }`}
           >
             <Copy className="w-4 h-4" />
@@ -145,10 +145,10 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
 
           <button
             onClick={() => setActiveTab('wispr')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'wispr'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/25'
+                : 'bg-[#FAF9F6] hover:bg-zinc-100 text-charcoal-muted hover:text-charcoal border border-[#E9E7EF]'
             }`}
           >
             <Mic className="w-4 h-4" />
@@ -172,6 +172,7 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
             variant="primary"
             size="sm"
             onClick={onProceedToExport}
+            className="shadow-sm shadow-brand-500/20"
           >
             Review & Export →
           </Button>
@@ -180,137 +181,156 @@ export const OrganizationStudio: React.FC<OrganizationStudioProps> = ({
 
       {/* Main Tab Content */}
       {activeTab === 'tree' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Panel: File Collection Inventory (5 cols) */}
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-zinc-200 shadow-card flex flex-col h-[650px] overflow-hidden">
-            <div className="p-4 border-b border-zinc-100 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-sm text-charcoal">Original File Inventory</h3>
-                  <p className="text-xs text-charcoal-subtle">
-                    {planSummary.includedInExport} of {planSummary.totalFiles} files selected for export
-                  </p>
-                </div>
-              </div>
-
-              {/* Search */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-2.5" />
-                <input
-                  type="text"
-                  value={fileSearch}
-                  onChange={(e) => setFileSearch(e.target.value)}
-                  placeholder="Filter inventory files..."
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
+        <div className="space-y-4">
+          {/* Subtle transformational orientation banner */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                Two-Panel Workspace
+              </span>
+              <span className="text-xs text-brand-600 font-semibold">• From Chaos to Clarity</span>
             </div>
-
-            {/* List */}
-            <div className="flex-1 overflow-y-auto divide-y divide-zinc-50 p-2 space-y-1">
-              {filteredInventory.map((item) => {
-                const isSelected = selectedFileId === item.fileId;
-                const isExcluded = !item.isIncludedInExport;
-
-                return (
-                  <div
-                    key={item.fileId}
-                    onClick={() => setSelectedFileId(item.fileId)}
-                    className={`p-3 rounded-xl cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-brand-50 border border-brand-200 shadow-sm'
-                        : 'hover:bg-zinc-50 border border-transparent'
-                    } ${isExcluded ? 'opacity-60' : ''}`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <FileText className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className={`font-semibold text-xs truncate ${isSelected ? 'text-brand-950' : 'text-charcoal'}`}>
-                            {item.originalName}
-                          </p>
-                          <p className="text-[11px] text-zinc-400 truncate">
-                            Target: {item.proposedPath}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingFileId(item.fileId);
-                          }}
-                          className="p-1 rounded text-zinc-400 hover:text-brand-600 hover:bg-brand-100 transition-colors"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        {isExcluded && (
-                          <Badge variant="danger" size="sm">
-                            Excluded
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <span className="text-xs text-charcoal-subtle hidden sm:inline">
+              Click any file or folder to customize names and destinations
+            </span>
           </div>
 
-          {/* Right Panel: Proposed Virtual Folder Tree (7 cols) */}
-          <div className="lg:col-span-7 bg-white rounded-2xl border border-zinc-200 shadow-card flex flex-col h-[650px] overflow-hidden">
-            <div className="p-4 border-b border-zinc-100 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-sm text-charcoal">Proposed Virtual Folder Hierarchy</h3>
-                <p className="text-xs text-charcoal-subtle">
-                  Live preview of how your files will be arranged in the exported ZIP archive
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono bg-zinc-100 px-2 py-1 rounded text-zinc-600">
-                  {virtualTree.summary.folderCount} Folders
-                </span>
-                <span className="text-xs font-mono bg-teal-50 text-teal-700 px-2 py-1 rounded border border-teal-200">
-                  {formatBytes(virtualTree.summary.estimatedOutputSize)}
-                </span>
-              </div>
-            </div>
-
-            {/* Tree Area */}
-            <div className="flex-1 overflow-y-auto p-4 bg-zinc-50/30">
-              <VirtualFolderTree
-                tree={virtualTree.tree}
-                selectedFileId={selectedFileId}
-                onSelectFile={(id) => {
-                  setSelectedFileId(id);
-                  setEditingFileId(id);
-                }}
-              />
-            </div>
-
-            {/* Bottom active inspector card if file selected */}
-            {selectedPlanItem && (
-              <div className="p-4 bg-surface border-t border-zinc-100 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <span className="text-xs font-bold text-charcoal truncate block">
-                    {selectedPlanItem.proposedFilename}
-                  </span>
-                  <span className="text-[11px] text-charcoal-subtle truncate block">
-                    Folder: {selectedPlanItem.proposedDestinationFolder || '(Root)'}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Panel: File Collection Inventory (5 cols) */}
+            <div className="lg:col-span-5 bg-white rounded-2xl border border-[#E9E7EF] shadow-card flex flex-col h-[650px] overflow-hidden">
+              <div className="p-4 border-b border-[#E9E7EF] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm text-charcoal">Original Collection</h3>
+                    <p className="text-xs text-charcoal-subtle">
+                      {planSummary.includedInExport} of {planSummary.totalFiles} files retained for export
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono text-charcoal-muted bg-[#FAF9F6] px-2 py-1 rounded-lg border border-[#E9E7EF]">
+                    {planSummary.totalFiles} files
                   </span>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingFileId(selectedPlanItem.fileId)}
-                  icon={<Edit2 className="w-3.5 h-3.5" />}
-                >
-                  Edit Location & Name
-                </Button>
+
+                {/* Search */}
+                <div className="relative">
+                  <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    value={fileSearch}
+                    onChange={(e) => setFileSearch(e.target.value)}
+                    placeholder="Filter inventory files..."
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#FAF9F6] border border-[#E9E7EF] rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans"
+                  />
+                </div>
               </div>
-            )}
+
+              {/* List */}
+              <div className="flex-1 overflow-y-auto divide-y divide-[#FAF9F6] p-2 space-y-1">
+                {filteredInventory.map((item) => {
+                  const isSelected = selectedFileId === item.fileId;
+                  const isExcluded = !item.isIncludedInExport;
+
+                  return (
+                    <div
+                      key={item.fileId}
+                      onClick={() => setSelectedFileId(item.fileId)}
+                      className={`p-3 rounded-xl cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-brand-50/80 border border-brand-200/90 shadow-sm'
+                          : 'hover:bg-[#FAF9F6] border border-transparent'
+                      } ${isExcluded ? 'opacity-60 bg-zinc-50/50' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <FileText className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? 'text-brand-600' : 'text-zinc-400'}`} />
+                          <div className="min-w-0">
+                            <p className={`font-semibold text-xs truncate ${isSelected ? 'text-brand-950' : 'text-charcoal'}`}>
+                              {item.originalName}
+                            </p>
+                            <p className="text-[11px] text-charcoal-subtle truncate font-mono">
+                              Target: {item.proposedPath}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingFileId(item.fileId);
+                            }}
+                            className="p-1 rounded-md text-zinc-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+                            title="Edit file location & name"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          {isExcluded && (
+                            <Badge variant="danger" size="sm">
+                              Excluded
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Panel: Proposed Virtual Folder Tree (7 cols) */}
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E9E7EF] shadow-card flex flex-col h-[650px] overflow-hidden">
+              <div className="p-4 border-b border-[#E9E7EF] flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-sm text-charcoal">Organized Preview</h3>
+                  <p className="text-xs text-charcoal-subtle">
+                    Live virtual hierarchy for your organized ZIP archive
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono bg-[#FAF9F6] px-2 py-1 rounded-lg border border-[#E9E7EF] text-charcoal-muted">
+                    {virtualTree.summary.folderCount} Folders
+                  </span>
+                  <span className="text-xs font-mono bg-mint-100 text-mint-dark px-2 py-1 rounded-lg border border-mint/40">
+                    {formatBytes(virtualTree.summary.estimatedOutputSize)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tree Area */}
+              <div className="flex-1 overflow-y-auto p-4 bg-[#FAF9F6]/40">
+                <VirtualFolderTree
+                  tree={virtualTree.tree}
+                  selectedFileId={selectedFileId}
+                  onSelectFile={(id) => {
+                    setSelectedFileId(id);
+                    setEditingFileId(id);
+                  }}
+                />
+              </div>
+
+              {/* Bottom active inspector card if file selected */}
+              {selectedPlanItem && (
+                <div className="p-4 bg-white border-t border-[#E9E7EF] flex items-center justify-between gap-3 shadow-xs">
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-charcoal truncate block">
+                      {selectedPlanItem.proposedFilename}
+                    </span>
+                    <span className="text-[11px] text-charcoal-subtle truncate block font-mono">
+                      Destination: {selectedPlanItem.proposedDestinationFolder || '(Root)'}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingFileId(selectedPlanItem.fileId)}
+                    icon={<Edit2 className="w-3.5 h-3.5 text-brand-600" />}
+                  >
+                    Edit Location & Name
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
