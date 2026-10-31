@@ -280,7 +280,8 @@ function interpretSingleClause(
       if (p.userModified) return false; // Preserve manual user edits
       const name = p.originalName.toLowerCase();
       const group = p.suggestedGroup ? p.suggestedGroup.toLowerCase() : '';
-      return name.includes(projectKeyword) || group.includes(projectKeyword);
+      const reason = p.groupingReason ? p.groupingReason.toLowerCase() : '';
+      return name.includes(projectKeyword) || group.includes(projectKeyword) || reason.includes(projectKeyword);
     });
 
     for (const item of matchingItems) {
@@ -307,6 +308,53 @@ function interpretSingleClause(
       matchedFiles,
       updates,
     };
+  }
+
+  // 5b. Content-Aware Semantic Topic Rule
+  // e.g. "Put files related to avionics in Aerospace", "Group healthcare documents into Medical", "Move audit files to Accounting"
+  const topicMatch = lower.match(/(?:put|move|group|place|organize)\s+(?:all\s+)?(?:files|documents)?\s*(?:related to|discussing|about|for)?\s*([a-zA-Z0-9_\-\s]+?)\s+(?:in|into|to)\s+(?:a\s+)?(?:folder\s+)?([a-zA-Z0-9_\-/]+)/i);
+  if (topicMatch) {
+    const rawTopic = topicMatch[1].trim().toLowerCase();
+    const rawDest = topicMatch[2].trim();
+    const targetFolder = rawDest.charAt(0).toUpperCase() + rawDest.slice(1);
+
+    const matchingItems = planItems.filter((p) => {
+      if (p.userModified) return false;
+      const name = p.originalName.toLowerCase();
+      const group = p.suggestedGroup ? p.suggestedGroup.toLowerCase() : '';
+      const reason = p.groupingReason ? p.groupingReason.toLowerCase() : '';
+      return name.includes(rawTopic) || group.includes(rawTopic) || reason.includes(rawTopic);
+    });
+
+    if (matchingItems.length > 0) {
+      const matchedFiles: MatchedFileItem[] = [];
+      const updates: Array<{ fileId: string; destinationFolder?: string; isIncluded?: boolean }> = [];
+
+      for (const item of matchingItems) {
+        matchedFiles.push({
+          fileId: item.fileId,
+          originalName: item.originalName,
+          currentDestination: item.proposedDestinationFolder,
+          proposedDestination: targetFolder,
+          category: item.category,
+          isIncludedInExport: item.isIncludedInExport,
+          actionDescription: `Move to ${targetFolder}/ based on content match '${rawTopic}'`,
+        });
+        updates.push({ fileId: item.fileId, destinationFolder: targetFolder });
+      }
+
+      return {
+        ruleId,
+        title: `Organize '${rawTopic}' Content into ${targetFolder}`,
+        rawClause,
+        isSupported: true,
+        actionType: 'move_folder',
+        targetFolder,
+        description: `Move ${matchedFiles.length} file(s) matching topic '${rawTopic}' into folder '${targetFolder}'`,
+        matchedFiles,
+        updates,
+      };
+    }
   }
 
   // 6. Chronological / Year & Month Rule

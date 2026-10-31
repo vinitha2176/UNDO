@@ -2,12 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import {
+  DocumentExtractionResult,
   ExportRecord,
   OrganizationPlanItem,
   PlanChangeRecord,
   PlanChangeType,
+  SemanticCluster,
   SessionRecord,
   UploadedFileRecord,
+  VersionRelationship,
 } from '../types';
 import { config } from '../utils/config';
 import { AppError } from '../middleware/errorHandler';
@@ -229,6 +232,45 @@ export class SessionService {
     const session = this.getSession(sessionId);
     if (!session) return [];
     return session.history ? [...session.history] : [];
+  }
+
+  /**
+   * Content extraction and semantic intelligence state management
+   */
+  public setSessionExtractions(sessionId: string, extractions: Map<string, DocumentExtractionResult>): void {
+    const session = this.getSession(sessionId);
+    if (session) {
+      session.extractions = new Map(extractions);
+    }
+  }
+
+  public getSessionExtractions(sessionId: string): Map<string, DocumentExtractionResult> | undefined {
+    const session = this.getSession(sessionId);
+    return session?.extractions;
+  }
+
+  public setSessionSemanticClusters(sessionId: string, clusters: SemanticCluster[]): void {
+    const session = this.getSession(sessionId);
+    if (session) {
+      session.semanticClusters = clusters;
+    }
+  }
+
+  public getSessionSemanticClusters(sessionId: string): SemanticCluster[] | undefined {
+    const session = this.getSession(sessionId);
+    return session?.semanticClusters;
+  }
+
+  public setSessionVersionFamilies(sessionId: string, versions: VersionRelationship[]): void {
+    const session = this.getSession(sessionId);
+    if (session) {
+      session.versionFamilies = versions;
+    }
+  }
+
+  public getSessionVersionFamilies(sessionId: string): VersionRelationship[] | undefined {
+    const session = this.getSession(sessionId);
+    return session?.versionFamilies;
   }
 
   /**

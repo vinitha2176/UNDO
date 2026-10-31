@@ -6,6 +6,7 @@ import {
   UploadedFileRecord,
 } from '../types';
 import { detectProjectGroups } from './projectGroupingService';
+import { sessionService } from './sessionService';
 
 const ALL_CATEGORIES: FileCategory[] = [
   'documents',
@@ -114,14 +115,40 @@ export function analyzeSessionFiles(
 
   let totalSizeBytes = 0;
 
-  // 4. Update file records with project group info
+  // Retrieve semantic intelligence state if available
+  const extractionsMap = sessionService.getSessionExtractions(sessionId);
+  const safeExtractions = extractionsMap
+    ? Array.from(extractionsMap.values()).map(({ extractedText, ...rest }) => rest)
+    : [];
+  const semanticClusters = sessionService.getSessionSemanticClusters(sessionId) || [];
+  const versionFamilies = sessionService.getSessionVersionFamilies(sessionId) || [];
+
+  const semanticClusterMap = new Map<string, (typeof semanticClusters)[0]>();
+  for (const cluster of semanticClusters) {
+    for (const fId of cluster.fileIds) {
+      if (!semanticClusterMap.has(fId)) {
+        semanticClusterMap.set(fId, cluster);
+      }
+    }
+  }
+
+  // 4. Update file records with project and semantic group info
   const enrichedFiles: SafeFileMetadata[] = rawFiles.map((file) => {
     totalSizeBytes += file.size;
     categoryCounts[file.category] = (categoryCounts[file.category] || 0) + 1;
 
+    const cluster = semanticClusterMap.get(file.id);
     const groupInfo = fileGroupMap.get(file.id);
-    const suggestedGroup = groupInfo ? groupInfo.groupName : null;
-    const groupingReason = groupInfo ? groupInfo.reason : null;
+    let suggestedGroup: string | null = null;
+    let groupingReason: string | null = null;
+
+    if (cluster) {
+      suggestedGroup = cluster.topicSummary;
+      groupingReason = `Content topic: ${cluster.topicSummary} (Evidence: ${cluster.contentEvidence.slice(0, 3).join(', ')})`;
+    } else if (groupInfo) {
+      suggestedGroup = groupInfo.groupName;
+      groupingReason = groupInfo.reason;
+    }
 
     return {
       ...toSafeFileMetadata(file),
@@ -138,5 +165,8 @@ export function analyzeSessionFiles(
     duplicateGroups,
     suggestedProjectGroups: projectGroups,
     files: enrichedFiles,
+    contentExtractions: safeExtractions,
+    semanticClusters,
+    versionFamilies,
   };
 }

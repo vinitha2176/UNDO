@@ -5,10 +5,11 @@
 
 ---
 
-## 🌟 The Core Principle
+## 🌟 The Core Principle & Privacy Boundaries
 
-**The application NEVER deletes, renames, moves, or overwrites files in your original source folders.**  
-All analysis, categorization, collision resolution, and duplicate decisions operate inside isolated temporary sessions and generate non-destructive organization proposals. The user reviews and customizes the plan before downloading a clean, organized ZIP archive containing a machine-readable change manifest (`undo-manifest.json`).
+**The application NEVER deletes, renames, moves, or overwrites original files in your computer's folders.**  
+- **Original Local Files vs. Session Copies:** Original files on your computer remain completely untouched and immutable. When files are imported, isolated temporary working copies are stored in `backend/storage/sessions/<sessionId>/uploads` strictly for content extraction and analysis, and are purged upon session cleanup.
+- **Localhost vs. Remote Deployments:** In the standard local setup (`localhost:3000` / `localhost:3001`), all file parsing, hashing, and organization calculations occur entirely on your local machine (`127.0.0.1`). In a remote deployment, files are uploaded over HTTP to the backend server. While the backend processes files using self-contained Node.js libraries with **zero external cloud AI API calls** (no OpenAI, Gemini, or Anthropic), files in a remote deployment do travel across the network to that server. UNDO is not a browser-only client application.
 
 ---
 
@@ -19,11 +20,18 @@ All analysis, categorization, collision resolution, and duplicate decisions oper
    - Synthetic **"Try with Sample Files"** mode for instant 90-second evaluation by hackathon judges.
    - Enforces configurable limits (100 files, 20 MB per file, 100 MB per session).
 
-2. **Intelligent File Analysis:**
-   - Real-time categorization (documents, spreadsheets, presentations, images, audio, video, archives, source code).
+2. **Content-Aware Document Analysis & Clustering:**
+   - Modular text extraction across PDF (text layer), DOCX, PPTX, XLSX, CSV, TXT, and Markdown using self-contained Node.js libraries (zero external AI APIs).
+   - Statistical TF-IDF vector space modeling with cosine similarity and lexical concept term overlap (not a neural embedding model).
+   - Explainable folder suggestions with visible content evidence terms and confidence badges.
    - Exact SHA-256 duplicate detection across different filenames.
-   - Project group suggestions based on common prefix conventions (e.g. `pathfinder_*`).
-   - Calculation of potential redundant storage savings.
+   - Conservative near-duplicate and revision detection (≥80% content similarity threshold).
+   - **Benchmark Evaluation Results:** On our specific 20-document synthetic multi-format benchmark:
+     - **Pairwise Precision:** 100.0% (0 false positives — zero cross-topic contamination).
+     - **Pairwise Recall:** 62.5% (9 false negatives — 3 compact single-table CSV files were missed because sparse tabular headers fell below the 0.15 threshold against narrative prose).
+     - **F1-Score:** 76.9%.
+     - **Rename Invariance:** 100.0% (groupings remained identical after renaming all 20 files).
+   - *Limitations Note:* Raster images (JPEG/PNG) are explicitly flagged as requiring OCR. Detecting scanned documents in arbitrary PDFs using text length heuristics is an unverified limitation and true OCR inspection is not implemented.
 
 3. **Interactive Organization Studio:**
    - **Virtual Folder Tree Preview:** Live hierarchical view of proposed folders with file counts and aggregate sizes.
@@ -39,9 +47,11 @@ All analysis, categorization, collision resolution, and duplicate decisions oper
 5. **Before & After Visual Comparison:**
    - Side-by-side audit of original files vs proposed destination paths, highlighting renames, reassignments, and exclusions.
 
-6. **Wispr Flow Dictation Ready:**
-   - Voice-friendly organization preference interpreter supporting spoken instructions such as *"Put all screenshots into Assets and keep presentations separate"*.
+6. **Wispr Flow Voice-First Preferences:**
+   - Designed for voice dictation using the **external Wispr Flow desktop app**: click inside the instruction box, press your desktop dictation hotkey (e.g. `Fn` or `Caps Lock`), and speak naturally.
+   - Multi-instruction clause parser supporting compound spoken preferences such as *"Put all screenshots in a Screenshots folder, group Pathfinder files together, and keep all duplicate copies"*.
    - Transparent preview of interpreted rules before applying changes through the backend.
+   - *Integration Clarification:* UNDO does not integrate via proprietary in-browser audio APIs; voice input relies on the external Wispr Flow application dictating text into the editable transcript area. Automated tests verify UNDO's transcript parsing and rule execution; desktop voice dictation was verified manually.
 
 7. **Validated Streaming ZIP Export:**
    - Real streaming archive creation with `archiver` and maximum compression.
@@ -60,12 +70,12 @@ UNDO/
 │   │   ├── server.ts         # Server bootstrap & graceful shutdown
 │   │   ├── routes/           # Versioned API routes (/api/v1)
 │   │   ├── controllers/      # REST endpoint controllers
-│   │   ├── services/         # File analysis, plan management, deduplication, streaming ZIP export
+│   │   ├── services/         # Content extraction, TF-IDF analysis, plan management, deduplication, ZIP export
 │   │   ├── middleware/       # Multer isolated upload storage & validation
 │   │   ├── utils/            # Streaming SHA-256 hasher, path traversal sanitizer
 │   │   ├── schemas/          # Zod validation schemas
-│   │   └── test/             # 50 automated tests (unit + integration) + live demo script
-│   └── storage/              # Isolated session uploads & temporary exports (.gitignored)
+│   │   └── test/             # 73 automated tests (unit + integration) + synthetic benchmark
+│   └── storage/              # Isolated temporary session uploads & exports (.gitignored)
 │
 └── frontend/                 # React 18 / Vite / TypeScript / Tailwind CSS Single Page App
     ├── src/
@@ -77,61 +87,89 @@ UNDO/
     │   │   ├── duplicates/   # Duplicate review center with redundant storage estimation
     │   │   ├── export/       # Export confirmation, ZIP downloader & manifest inspector
     │   │   └── common/       # Button, Badge, Modal, Toast
-    │   ├── services/         # Typed API client & synthetic sample dataset
+    │   ├── services/         # Typed API client, Wispr preference interpreter, synthetic sample dataset
     │   ├── utils/            # Byte formatters, date formatters, category badge helpers
-    │   └── test/             # 11 unit & end-to-end integration tests
+    │   └── test/             # 42 automated tests (unit + component + integration)
     └── dist/                 # Production-ready static bundle
 ```
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (Windows PowerShell)
 
-### 1. Start the Backend API (Port 3001)
+Open **two separate Windows PowerShell terminal windows**:
 
-```bash
+### Terminal 1 — Start the Backend API (Port 3001)
+
+```powershell
 cd backend
 npm install
 npm run dev
 ```
 
-*Backend runs on `http://localhost:3001/api/v1`*
+*Expected output: `[Server] UNDO backend server running on http://localhost:3001`*
 
-### 2. Start the Frontend Application (Port 3000)
+### Terminal 2 — Start the Frontend Application (Port 3000)
 
-```bash
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
+*Expected output: `VITE ready in ... ms -> Local: http://localhost:3000/`*  
 *Open your browser at `http://localhost:3000`*
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Both the backend and frontend include automated test suites:
+Both the backend and frontend include automated test suites (115 total automated tests + 13 browser E2E steps). No critical bugs were found in the tested scenarios:
 
-### Run Backend Tests (50 Tests)
+### Run Backend Tests (73 Tests)
 
-```bash
+```powershell
 cd backend
 npm test
 ```
 
-### Run Frontend Tests (11 Tests)
+### Run Frontend Tests (42 Tests)
 
-```bash
+```powershell
 cd frontend
 npm test
 ```
 
-### Run the Interactive Phase 2 Demo
+### Run Content Intelligence Synthetic Benchmark (20 Files)
 
-```bash
+```powershell
 cd backend
-npm run demo
+npx tsx src/test/syntheticContentBenchmark.ts
+```
+
+### Run Real Chrome Browser E2E Automation (13 Steps)
+
+```powershell
+cd backend
+npx tsx src/test/realBrowserE2E.ts
+```
+
+---
+
+## 📦 Production Build Verification (Windows PowerShell)
+
+Verify clean production builds with zero TypeScript errors:
+
+### Backend Production Build
+```powershell
+cd backend
+npm run build
+```
+
+### Frontend Production Build
+```powershell
+cd frontend
+npm run build
 ```
 
 ---

@@ -11,6 +11,39 @@ async function runBrowserE2E() {
   console.log('   UNDO PHASE 4: REAL BROWSER END-TO-END AUTOMATION TEST (CHROME)       ');
   console.log('========================================================================\n');
 
+  let backendServer: any = null;
+  let viteServer: any = null;
+
+  // 1. Ensure backend is running
+  try {
+    const res = await fetch('http://localhost:3001/api/v1/health');
+    if (!res.ok) throw new Error();
+    console.log('[Server] Connected to existing backend on http://localhost:3001');
+  } catch {
+    const { createApp } = await import('../app');
+    const app = createApp();
+    await new Promise<void>((resolve, reject) => {
+      backendServer = app.listen(3001, () => resolve());
+      backendServer.on('error', reject);
+    });
+    console.log('[Server] In-process backend started on http://localhost:3001');
+  }
+
+  // 2. Ensure frontend is running
+  try {
+    const res = await fetch('http://localhost:3000');
+    if (!res.ok) throw new Error();
+    console.log('[Server] Connected to existing frontend on http://localhost:3000');
+  } catch {
+    const viteModule = (await import('../../../frontend/node_modules/vite/dist/node/index.js' as any)) as any;
+    viteServer = await viteModule.createServer({
+      root: path.resolve(__dirname, '../../../frontend'),
+      server: { port: 3000 },
+    });
+    await viteServer.listen();
+    console.log('[Server] In-process frontend started on http://localhost:3000');
+  }
+
   console.log('[Browser] Launching Google Chrome via Playwright-Core...');
   const browser = await chromium.launch({
     executablePath: CHROME_PATH,
@@ -335,7 +368,21 @@ async function runBrowserE2E() {
     console.log('     REAL BROWSER END-TO-END WORKFLOW: 100% SUCCESS (ALL PASSED)        ');
     console.log('========================================================================\n');
   } finally {
-    await browser.close();
+    try {
+      await browser.close();
+    } catch {}
+    if (viteServer) {
+      try {
+        await viteServer.close();
+        console.log('[Server] Stopped in-process frontend');
+      } catch {}
+    }
+    if (backendServer) {
+      try {
+        await new Promise<void>((r) => backendServer.close(() => r()));
+        console.log('[Server] Stopped in-process backend');
+      } catch {}
+    }
   }
 }
 

@@ -15,6 +15,10 @@ import {
   Info,
   CheckCircle2,
   AlertTriangle,
+  Sparkles,
+  Cpu,
+  Layers,
+  GitBranch,
 } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import { formatBytes, getCategoryBadgeClass } from '../../utils/formatters';
@@ -73,6 +77,15 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
   const [selectedFileForInspection, setSelectedFileForInspection] = useState<SafeFileMetadata | null>(
     analysis.files.length > 0 ? analysis.files[0] : null
   );
+
+  // Content extraction and semantic metrics
+  const successfulExtractions = analysis.contentExtractions?.filter((e) => e.status === 'success') || [];
+  const extractedCount = successfulExtractions.length;
+  const semanticClusters = analysis.semanticClusters || [];
+  const versionFamilies = analysis.versionFamilies || [];
+  const inspectedExtraction = selectedFileForInspection
+    ? analysis.contentExtractions?.find((e) => e.fileId === selectedFileForInspection.id)
+    : null;
 
   // Compute category color mapping
   const categoryColorMap: Record<string, string> = {
@@ -160,12 +173,156 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
           </div>
           <div>
             <div className="text-2xl font-extrabold text-charcoal">
-              {analysis.suggestedProjectGroups.length}
+              {semanticClusters.length > 0 ? semanticClusters.length : analysis.suggestedProjectGroups.length}
             </div>
-            <div className="text-xs font-medium text-charcoal-subtle">Suggested Project Groups</div>
+            <div className="text-xs font-medium text-charcoal-subtle">
+              {semanticClusters.length > 0 ? 'Semantic Project Clusters' : 'Suggested Project Groups'}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* 100% Local Content Intelligence Status */}
+      {analysis.contentExtractions && analysis.contentExtractions.length > 0 && (
+        <div className="bg-gradient-to-r from-brand-50/70 via-indigo-50/40 to-teal-50/40 rounded-2xl p-4 border border-brand-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-800">
+                  Content-Aware Local Intelligence
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  100% Local Inference &amp; Zero Cloud APIs
+                </span>
+              </div>
+              <p className="text-xs text-charcoal-muted mt-0.5">
+                Extracted readable text from {extractedCount} of {analysis.totalFiles} documents across PDF, DOCX, PPTX, TXT, CSV, and XLSX.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-bold font-mono text-brand-700 bg-white/80 px-2.5 py-1 rounded-lg border border-brand-200/60">
+              {semanticClusters.length} Semantic Clusters
+            </span>
+            {versionFamilies.length > 0 && (
+              <span className="text-xs font-bold font-mono text-purple-700 bg-white/80 px-2.5 py-1 rounded-lg border border-purple-200/60">
+                {versionFamilies.length} Version Families
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Semantic Topic Clusters */}
+      {semanticClusters.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="w-5 h-5 text-brand-600" />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-charcoal">
+                Content-Derived Semantic Project Clusters
+              </h3>
+            </div>
+            <span className="text-xs text-charcoal-subtle font-mono">
+              Clustered by TF-IDF &amp; Concept Overlap
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {semanticClusters.map((cluster) => (
+              <div
+                key={cluster.clusterId}
+                className="p-4 rounded-xl border border-brand-100 bg-gradient-to-br from-brand-50/40 to-white space-y-2.5 hover:border-brand-300 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h4 className="font-bold text-sm text-charcoal">{cluster.topicSummary}</h4>
+                    <span className="text-xs font-mono text-brand-700 font-medium">
+                      📁 {cluster.suggestedFolderName}/
+                    </span>
+                  </div>
+                  <Badge
+                    variant={cluster.confidence === 'strong' ? 'mint' : cluster.confidence === 'moderate' ? 'brand' : 'warning'}
+                    size="sm"
+                  >
+                    {cluster.confidence} confidence
+                  </Badge>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-subtle block">
+                    Content Evidence Terms
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {cluster.contentEvidence.map((term) => (
+                      <span
+                        key={term}
+                        className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-white border border-brand-200/70 text-brand-800"
+                      >
+                        #{term}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-1 flex items-center justify-between text-xs text-charcoal-muted border-t border-brand-100/60">
+                  <span>{cluster.fileIds.length} member documents</span>
+                  <span className="font-mono text-[11px] text-charcoal-subtle">
+                    avg sim: {(cluster.averageSimilarity * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Version Families & Near-Duplicates (>=80% Content Similarity) */}
+      {versionFamilies.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 border border-purple-100 shadow-card space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <GitBranch className="w-5 h-5 text-purple-600" />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-charcoal">
+                Document Versions &amp; Near-Duplicates (≥80% Content Match)
+              </h3>
+            </div>
+            <span className="text-xs text-purple-600 font-semibold font-mono">
+              Conservative Non-Destructive Detection
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {versionFamilies.map((rel, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-xl border border-purple-100/80 bg-purple-50/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"
+              >
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 font-mono font-medium text-charcoal">
+                    <span className="text-purple-700 font-bold truncate max-w-xs">{rel.sourceFileName}</span>
+                    <span className="text-charcoal-subtle">↔</span>
+                    <span className="text-purple-700 font-bold truncate max-w-xs">{rel.targetFileName}</span>
+                    <Badge variant={rel.relationshipType === 'revision' ? 'brand' : 'warning'} size="sm">
+                      {rel.relationshipType === 'revision' ? 'Revision' : 'Near Duplicate'}
+                    </Badge>
+                  </div>
+                  <p className="text-charcoal-muted">{rel.explanation}</p>
+                </div>
+                <div className="shrink-0 flex items-center gap-2">
+                  <span className="font-mono font-bold text-purple-700 bg-white px-2.5 py-1 rounded-lg border border-purple-200">
+                    {(rel.similarityScore * 100).toFixed(0)}% match
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Visual Category Distribution Bar & Filter Pills */}
       <div className="bg-white rounded-2xl p-5 border border-[#E9E7EF] shadow-card space-y-4">
@@ -245,10 +402,33 @@ export const AnalysisOverview: React.FC<AnalysisOverviewProps> = ({
             </p>
             {selectedFileForInspection.suggestedGroup && (
               <div className="pt-1 flex items-center gap-2 text-xs text-charcoal-subtle">
-                <span>Associated Project:</span>
+                <span>Associated Topic / Project:</span>
                 <Badge variant="brand" size="sm">
                   {selectedFileForInspection.suggestedGroup}
                 </Badge>
+              </div>
+            )}
+            {inspectedExtraction && inspectedExtraction.status === 'success' && (
+              <div className="pt-1.5 flex flex-wrap items-center gap-2 text-xs text-charcoal-subtle border-t border-brand-100/60 mt-1.5">
+                <span className="font-semibold text-brand-900">Extracted Content:</span>
+                <span className="font-mono bg-white px-2 py-0.5 rounded border border-brand-200 text-brand-800">
+                  {inspectedExtraction.metadata.wordCount} words
+                </span>
+                {inspectedExtraction.metadata.pageCount !== undefined && (
+                  <span className="font-mono bg-white px-2 py-0.5 rounded border border-brand-200 text-brand-800">
+                    {inspectedExtraction.metadata.pageCount} pages
+                  </span>
+                )}
+                {inspectedExtraction.metadata.sheetCount !== undefined && (
+                  <span className="font-mono bg-white px-2 py-0.5 rounded border border-brand-200 text-brand-800">
+                    {inspectedExtraction.metadata.sheetCount} sheets
+                  </span>
+                )}
+                {inspectedExtraction.metadata.detectedTitle && (
+                  <span className="text-charcoal italic truncate max-w-sm">
+                    "{inspectedExtraction.metadata.detectedTitle}"
+                  </span>
+                )}
               </div>
             )}
           </div>

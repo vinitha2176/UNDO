@@ -93,6 +93,17 @@ export function generateInitialPlan(
     hashToFileMap.get(file.sha256)!.push(file);
   }
 
+  // Check for semantic clusters from content analysis
+  const semanticClusters = sessionService.getSessionSemanticClusters(sessionId) || [];
+  const semanticClusterMap = new Map<string, (typeof semanticClusters)[0]>();
+  for (const cluster of semanticClusters) {
+    for (const fId of cluster.fileIds) {
+      if (!semanticClusterMap.has(fId)) {
+        semanticClusterMap.set(fId, cluster);
+      }
+    }
+  }
+
   const usedPaths = new Set<string>();
   const planMap = new Map<string, OrganizationPlanItem>();
 
@@ -103,13 +114,18 @@ export function generateInitialPlan(
     const isPrimary = primaryFile.id === file.id;
     const isDuplicate = isMultiCopy && !isPrimary;
 
-    // Determine target folder
+    // Determine target folder: Semantic cluster > Filename project > Category folder
+    const semanticCluster = semanticClusterMap.get(file.id);
     const projectInfo = fileGroupMap.get(file.id);
     let targetFolder: string;
     let groupingReason: string;
     let suggestedGroup: string | null = null;
 
-    if (projectInfo) {
+    if (semanticCluster) {
+      targetFolder = semanticCluster.suggestedFolderName;
+      groupingReason = `Content topic: ${semanticCluster.topicSummary}. Evidence: [${semanticCluster.contentEvidence.join(', ')}] (${semanticCluster.confidence} confidence)`;
+      suggestedGroup = semanticCluster.topicSummary;
+    } else if (projectInfo) {
       targetFolder = `Projects/${projectInfo.groupName}`;
       groupingReason = projectInfo.reason;
       suggestedGroup = projectInfo.groupName;

@@ -20,6 +20,8 @@ import {
   updatePlanFileItem,
 } from '../services/organizationPlanService';
 import { detectProjectGroups } from '../services/projectGroupingService';
+import { extractDocumentContent } from '../services/contentExtractor';
+import { analyzeDocumentSemantics } from '../services/semanticAnalysisService';
 import { exportService } from '../services/exportService';
 import { AppError } from '../middleware/errorHandler';
 import {
@@ -30,7 +32,7 @@ import {
   UpdateDuplicateGroupSchema,
   UpdatePlanItemSchema,
 } from '../schemas/validationSchemas';
-import { UploadedFileRecord } from '../types';
+import { DocumentExtractionResult, SemanticCluster, UploadedFileRecord } from '../types';
 import { config } from '../utils/config';
 
 export class SessionController {
@@ -163,6 +165,42 @@ export class SessionController {
         uploadedRecords.push(record);
       }
 
+      // Extract content and run semantic analysis across session documents
+      const existingExtractions = sessionService.getSessionExtractions(sessionId) || new Map<string, DocumentExtractionResult>();
+      for (const file of uploadedRecords) {
+        try {
+          const extraction = await extractDocumentContent(file);
+          existingExtractions.set(file.id, extraction);
+        } catch (err) {
+          existingExtractions.set(file.id, {
+            fileId: file.id,
+            originalName: file.originalName,
+            detectedFormat: file.extension || 'unknown',
+            status: 'failed',
+            extractedText: '',
+            metadata: { wordCount: 0, charCount: 0, processingTimeMs: 0 },
+            warnings: [`Extraction encountered an error: ${err instanceof Error ? err.message : String(err)}`],
+            isSufficientForAnalysis: false,
+          });
+        }
+      }
+      sessionService.setSessionExtractions(sessionId, existingExtractions);
+
+      // Perform semantic clustering across all session extractions
+      const allExtractions = Array.from(existingExtractions.values());
+      const { clusters, versionRelationships } = analyzeDocumentSemantics(allExtractions);
+      sessionService.setSessionSemanticClusters(sessionId, clusters);
+      sessionService.setSessionVersionFamilies(sessionId, versionRelationships);
+
+      const semanticClusterMap = new Map<string, SemanticCluster>();
+      for (const cluster of clusters) {
+        for (const fId of cluster.fileIds) {
+          if (!semanticClusterMap.has(fId)) {
+            semanticClusterMap.set(fId, cluster);
+          }
+        }
+      }
+
       // Update project grouping across all session files
       const allSessionFiles = sessionService.getSessionFiles(sessionId);
       const { fileGroupMap } = detectProjectGroups(
@@ -170,9 +208,15 @@ export class SessionController {
       );
 
       for (const file of allSessionFiles) {
-        const groupInfo = fileGroupMap.get(file.id);
-        file.suggestedGroup = groupInfo ? groupInfo.groupName : null;
-        file.groupingReason = groupInfo ? groupInfo.reason : null;
+        const cluster = semanticClusterMap.get(file.id);
+        if (cluster) {
+          file.suggestedGroup = cluster.topicSummary;
+          file.groupingReason = `Content topic: ${cluster.topicSummary} (Evidence: ${cluster.contentEvidence.slice(0, 3).join(', ')})`;
+        } else {
+          const groupInfo = fileGroupMap.get(file.id);
+          file.suggestedGroup = groupInfo ? groupInfo.groupName : null;
+          file.groupingReason = groupInfo ? groupInfo.reason : null;
+        }
       }
 
       res.status(200).json({

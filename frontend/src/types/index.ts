@@ -70,6 +70,62 @@ export interface SessionAnalysisSummary {
   duplicateGroups: DuplicateGroup[];
   suggestedProjectGroups: ProjectGroupSuggestion[];
   files: SafeFileMetadata[];
+  contentExtractions?: DocumentExtractionSummary[];
+  semanticClusters?: SemanticCluster[];
+  versionFamilies?: VersionRelationship[];
+}
+
+export type ExtractionStatus =
+  | 'success'
+  | 'empty'
+  | 'unsupported'
+  | 'failed'
+  | 'encrypted'
+  | 'oversized';
+
+export interface DocumentMetadata {
+  wordCount: number;
+  charCount: number;
+  pageCount?: number;
+  slideCount?: number;
+  sheetCount?: number;
+  rowCount?: number;
+  columnCount?: number;
+  detectedTitle?: string;
+  extractedHeadings?: string[];
+  processingTimeMs: number;
+}
+
+export interface DocumentExtractionSummary {
+  fileId: string;
+  originalName: string;
+  detectedFormat: string;
+  status: ExtractionStatus;
+  metadata: DocumentMetadata;
+  warnings: string[];
+  isSufficientForAnalysis: boolean;
+}
+
+export interface SemanticCluster {
+  clusterId: string;
+  suggestedFolderName: string;
+  topicSummary: string;
+  contentEvidence: string[];
+  averageSimilarity: number;
+  confidence: 'strong' | 'moderate' | 'needs_review';
+  fileIds: string[];
+  fileNames: string[];
+}
+
+export interface VersionRelationship {
+  sourceFileId: string;
+  sourceFileName: string;
+  targetFileId: string;
+  targetFileName: string;
+  similarityScore: number;
+  relationshipType: 'near_duplicate' | 'revision' | 'version_family';
+  explanation: string;
+  contentEvidence: string[];
 }
 
 export interface OrganizationPlanItem {
