@@ -204,27 +204,33 @@ async function runBrowserE2E() {
     await page.waitForSelector('text=Customize Organization', { state: 'detached', timeout: 5000 });
 
     // ------------------------------------------------------------------------
-    // Step 9: Test Wispr Flow Preference Text Input
+    // Step 9: Test Wispr Flow Preference Text Input & Multi-Instruction Parsing
     // ------------------------------------------------------------------------
-    console.log('\n[E2E Step 9] Testing Wispr Flow Natural Language Preferences...');
+    console.log('\n[E2E Step 9] Testing Wispr Flow Voice-First Multi-Instruction Preferences...');
     const wisprTabBtn = page.getByRole('button', { name: /Wispr Dictation/i });
     await wisprTabBtn.click();
 
     await page.waitForSelector('text=Voice Dictation Ready');
-    console.log('  ✓ Opened Wispr Dictation tab');
+    await page.waitForSelector('text=Just tell UNDO how you want your files organized.');
+    console.log('  ✓ Opened Wispr Dictation tab with voice-first heading & guidance');
 
     const textarea = page.locator('textarea');
-    // Test rule 1: Put all screenshots in a Screenshots folder
-    await textarea.fill('Put all screenshots in a Screenshots folder');
+
+    // Test combined multi-instruction command
+    console.log('  Testing multi-instruction command: "Put screenshots in a Screenshots folder, group Pathfinder files together, and keep all duplicate copies."');
+    await textarea.fill('Put screenshots in a Screenshots folder, group Pathfinder files together, and keep all duplicate copies.');
     await page.waitForSelector('text=Interpreted Organization Rule:');
-    const ruleDesc = await page.textContent('text=Interpreted Organization Rule:');
-    console.log(`  ✓ Rule interpretation: "${ruleDesc?.trim()}"`);
+    await page.waitForSelector('text=3 instruction rule(s) recognized');
+    await page.waitForSelector('text=Organize Screenshots');
+    await page.waitForSelector('text=Group Pathfinder Project Files');
+    await page.waitForSelector('text=Retain All Duplicate Copies');
+    console.log('  ✓ Multi-instruction voice command interpreted into 3 discrete rules with matched files');
 
     // Click "Confirm & Apply Rule"
     const confirmRuleBtn = page.getByRole('button', { name: /Confirm & Apply Rule/i });
     await confirmRuleBtn.click();
-    await page.waitForTimeout(1200);
-    console.log('  ✓ Applied Wispr preference rule successfully');
+    await page.waitForTimeout(1500);
+    console.log('  ✓ Applied multi-instruction Wispr preference rules successfully');
 
     // Test unsupported rule handling
     await textarea.fill('Order a hot pizza and make it fly to Mars');
