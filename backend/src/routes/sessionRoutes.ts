@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { sessionController } from '../controllers/sessionController';
 import { uploadMiddleware } from '../middleware/uploadMiddleware';
 import { SessionIdParamSchema } from '../schemas/validationSchemas';
+import { sessionCreationLimiter, fileUploadLimiter } from '../middleware/rateLimiter';
 
 export const sessionRouter = Router();
 
@@ -15,14 +16,15 @@ const validateSessionId = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// POST /api/v1/sessions - Create an isolated upload session
-sessionRouter.post('/sessions', (req, res, next) => {
+// POST /api/v1/sessions - Create an isolated upload session (protected with IP rate limiting)
+sessionRouter.post('/sessions', sessionCreationLimiter, (req, res, next) => {
   sessionController.createSession(req, res, next);
 });
 
-// POST /api/v1/sessions/:sessionId/files - Upload files into the session
+// POST /api/v1/sessions/:sessionId/files - Upload files into the session (protected with IP rate limiting)
 sessionRouter.post(
   '/sessions/:sessionId/files',
+  fileUploadLimiter,
   validateSessionId,
   uploadMiddleware.array('files'),
   (req, res, next) => {

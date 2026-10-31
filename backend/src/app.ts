@@ -8,6 +8,9 @@ import { errorHandler, AppError } from './middleware/errorHandler';
 export function createApp(): Express {
   const app = express();
 
+  // Trust first proxy hop (Render, Vercel, reverse proxies) for correct client IP detection
+  app.set('trust proxy', 1);
+
   // Disable information disclosure header
   app.disable('x-powered-by');
 

@@ -2,11 +2,11 @@ import { app } from './app';
 import { config } from './utils/config';
 import { sessionService } from './services/sessionService';
 
-const server = app.listen(config.port, () => {
-  console.log(`[UNDO-BACKEND] Server listening on port ${config.port}`);
+const server = app.listen(config.port, config.host, () => {
+  console.log(`[UNDO-BACKEND] Server listening on http://${config.host}:${config.port}`);
   console.log(`[UNDO-BACKEND] Environment: ${config.nodeEnv}`);
   console.log(`[UNDO-BACKEND] Storage location: [storage root initialized]`);
-  console.log(`[UNDO-BACKEND] Health endpoint: http://localhost:${config.port}/api/v1/health`);
+  console.log(`[UNDO-BACKEND] Health endpoint: http://${config.host === '0.0.0.0' ? 'localhost' : config.host}:${config.port}/api/v1/health`);
 });
 
 // Graceful shutdown
