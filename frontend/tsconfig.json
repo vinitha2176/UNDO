@@ -17,5 +17,14 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/test",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }
