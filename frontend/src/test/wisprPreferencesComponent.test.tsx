@@ -182,3 +182,4 @@ describe('WisprPreferences Voice-First Component & Safety Tests', () => {
     expect(screen.queryByText(/Interpreted Organization Rule:/i)).not.toBeInTheDocument();
   });
 });
+
